@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Robolectric</title>
+    <script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(["_setAccount", "UA-58882116-1"]);
+  _gaq.push(["_trackPageview"]);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+    <link href="../images/favicon.ico" rel="icon" type="image/ico" />
+    <link href="../stylesheets/application-4badc936.css" rel="stylesheet" type="text/css" />
+    <script src="../javascripts/application-da39a3ee.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="sidebar">
+            <a href="/"><img class="logo" src="../images/robolectric-stacked-3f7ad42c.png" /></a>
+<ul class='nav nav-stacked'><li class='nav-header'>Setup</li><li class='nav-item'><a href='/getting-started/'>Getting Started</a></li><li class='nav-item'><a href='/writing-a-test/'>Writing Your First Test</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>User Guide</li><li class='nav-item'><a href='/configuring/'>Configuring Robolectric</a></li><li class='nav-item'><a href='/activity-lifecycle/'>Driving the Activity Lifecycle</a></li><li class='nav-item'><a href='/using-add-on-modules/'>Using Add-On Modules</a></li><li class='nav-item'><a href='/using-libraries/'>Using Library Resources</a></li><li class='nav-item'><a href='/using-qualifiers/'>Using Qualified Resources</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>Customizing</li><li class='nav-item'><a href='/extending/'>Extending Robolectric</a></li><li class='nav-item'><a href='/custom-shadows/'>Creating Custom Shadows</a></li><li class='nav-item'><a href='/custom-test-runner/'>Customizing the Test Runner</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>Contributing</li><li class='nav-item'><a href='/contributing/'>Contributor Guidelines</a></li></ul>
+
+            <ul class="nav nav-stacked">
+    <li class="nav-header">Resources</li>
+    <li class="nav-item">
+        <a href='http://groups.google.com/group/robolectric'>Mailing List</a>
+    </li>
+    <li class="nav-item">
+        <a href='http://robolectric.blogspot.com/'>Blog</a>
+    </li>
+    <li class="nav-item">
+        <a href='https://twitter.com/robolectric'>Twitter</a>
+    </li>
+    <li class="nav-item">
+        <a href='/javadoc/3.1/index.html'>Robolectric 3.1 Javadocs</a>
+    </li>
+    <li class="nav-item">
+        <a href='/javadoc/3.0/index.html'>Robolectric 3.0 Javadocs</a>
+    </li>
+    <li class="nav-item">
+        <a href='/javadoc/2.4/index.html'>Robolectric 2.4 Javadocs</a>
+    </li>
+</ul>
+
+        </div>
+
+        <div id="content">
+            <h1>Using Library Resources</h1>
+
+<p>When Robolectric runs a test, it attempts to load and index all resources provided by your application so it can return these resources when you call into the AssetManager. For resources provided by 3rd party libraries (i.e. aars or apklibs), some additional configuration is required.</p>
+
+<h3>Using Libraries with Gradle</h3>
+
+<p>If you use Gradle to build your application and you are using <code>RobolectricGradleTestRunner</code> to run your tests, no additional configuration is required. This is because the Android Gradle plugin will merge 3rd party library resources with your application&#39;s resources at build time.</p>
+
+<h3>Using Libraries with Maven</h3>
+
+<p>If you use Maven to build your application, you will need to tell Robolectric where the unpacked resources are located for each library you use. This can either be specified in the <code>@Config</code> annotation:</p>
+<pre class="highlight plaintext">@RunWith(RobolectricTestRunner.class)
+@Config(libraries = {
+    "build/unpacked-libraries/library1",
+    "build/unpacked-libraries/library2"
+})
+public class SandwichTest {
+}
+</pre>
+<p>or specified in the <code>robolectric.properties</code> file:</p>
+<pre class="highlight plaintext">libraries=build/unpacked-libraries/library1,build/unpacked-libraries/library2
+</pre>
+<p>All paths are relative to the root directory of the project.</p>
+
+<h3>Debugging Resource Loading Issues</h3>
+
+<p>If you are not sure if resources are being loaded for a particular library, enable debug logging by setting the system property <code>robolectric.logging.enabled = true</code> and run your tests. You should see lots of output like:</p>
+<pre class="highlight plaintext">Loading resources for 'com.foo' from build/unpacked-libraries/library1...
+</pre>
+<p>If you don&#39;t see a particular library in the list, double-check the configuration.</p>
+
+        </div>
+    </div>
+</body>
+</html>

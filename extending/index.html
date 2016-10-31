@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Robolectric</title>
+    <script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(["_setAccount", "UA-58882116-1"]);
+  _gaq.push(["_trackPageview"]);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+    <link href="../images/favicon.ico" rel="icon" type="image/ico" />
+    <link href="../stylesheets/application-4badc936.css" rel="stylesheet" type="text/css" />
+    <script src="../javascripts/application-da39a3ee.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="sidebar">
+            <a href="/"><img class="logo" src="../images/robolectric-stacked-3f7ad42c.png" /></a>
+<ul class='nav nav-stacked'><li class='nav-header'>Setup</li><li class='nav-item'><a href='/getting-started/'>Getting Started</a></li><li class='nav-item'><a href='/writing-a-test/'>Writing Your First Test</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>User Guide</li><li class='nav-item'><a href='/configuring/'>Configuring Robolectric</a></li><li class='nav-item'><a href='/activity-lifecycle/'>Driving the Activity Lifecycle</a></li><li class='nav-item'><a href='/using-add-on-modules/'>Using Add-On Modules</a></li><li class='nav-item'><a href='/using-libraries/'>Using Library Resources</a></li><li class='nav-item'><a href='/using-qualifiers/'>Using Qualified Resources</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>Customizing</li><li class='nav-item'><a href='/extending/'>Extending Robolectric</a></li><li class='nav-item'><a href='/custom-shadows/'>Creating Custom Shadows</a></li><li class='nav-item'><a href='/custom-test-runner/'>Customizing the Test Runner</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>Contributing</li><li class='nav-item'><a href='/contributing/'>Contributor Guidelines</a></li></ul>
+
+            <ul class="nav nav-stacked">
+    <li class="nav-header">Resources</li>
+    <li class="nav-item">
+        <a href='http://groups.google.com/group/robolectric'>Mailing List</a>
+    </li>
+    <li class="nav-item">
+        <a href='http://robolectric.blogspot.com/'>Blog</a>
+    </li>
+    <li class="nav-item">
+        <a href='https://twitter.com/robolectric'>Twitter</a>
+    </li>
+    <li class="nav-item">
+        <a href='/javadoc/3.1/index.html'>Robolectric 3.1 Javadocs</a>
+    </li>
+    <li class="nav-item">
+        <a href='/javadoc/3.0/index.html'>Robolectric 3.0 Javadocs</a>
+    </li>
+    <li class="nav-item">
+        <a href='/javadoc/2.4/index.html'>Robolectric 2.4 Javadocs</a>
+    </li>
+</ul>
+
+        </div>
+
+        <div id="content">
+            <h1>Extending Robolectric</h1>
+
+<p>Robolectric is a work in progress, and we welcome contributions from the community. We encourage developers to <a title="Help.GitHub - Fork A Repo" href="http://help.github.com/fork-a-repo/">use the standard GitHub workflow</a> to fork, enhance, and submit pull requests to us.</p>
+
+<h2>Shadow Classes</h2>
+
+<p>Robolectric defines many shadow classes, which modify or extend the behavior of classes in the Android OS. When an Android class is instantiated, Robolectric looks for a corresponding shadow class, and if it finds one it creates a shadow object to associate with it. Every time a method is invoked on an Android class, Robolectric ensures that the shadow class&#39; corresponding method is invoked first (if there is one), so it has a chance to work its magic. This applies to all methods, even static and final methods, because Robolectric is extra tricky!</p>
+
+<h3>What&#39;s in a Name?</h3>
+
+<p>Why &quot;Shadow?&quot; Shadow objects are not quite <a title="Proxy pattern - Wikipedia, the free encyclopedia" href="http://en.wikipedia.org/wiki/Proxy_pattern">Proxies</a>, not quite <a title="Fake Object" href="http://c2.com/cgi/wiki?FakeObject">Fakes</a>, not quite <a title="Mocks Aren't Stubs" href="http://martinfowler.com/articles/mocksArentStubs.html#TheDifferenceBetweenMocksAndStubs">Mocks or Stubs</a>. Shadows are sometimes hidden, sometimes seen, and can lead you to the real object. At least we didn&#39;t call them &quot;sheep&quot;, which we were considering.</p>
+
+<h3>Adding Functionality</h3>
+
+<p>If the shadow classes provided with Robolectric don&#39;t do what you want, it&#39;s possible to change their behavior for a single test, a group of tests, or for your whole suite. Simply declare a class (let&#39;s say <code>ShadowFoo</code>) and annotate it <code>@Implements(Foo.class)</code>. Your shadow class may extend one of the stock Robolectric shadows if you like. To let Robolectric know about your shadow, annotate your test method or class with the <code>@Config(shadows=ShadowFoo.class)</code>, or create a file called <code>org.robolectric.Config.properties</code> containing the line <code>shadows=my.package.ShadowFoo</code>.</p>
+
+<p>From Robolectric 2.0 on, the number of shadow classes needed is greatly reduced, because real Android OS code is present. Methods on your shadow class are able to call through to the Android OS code if you like, using <code>Robolectric.directlyOn()</code>.</p>
+
+<h3>Shadow Classes</h3>
+
+<p>Shadow classes always need a public no-arg constructor so that the Robolectric framework can instantiate them. They are associated to the class that they Shadow with an <code>@Implements</code> annotation on the class declaration. In general, they should be implemented as if from scratch, the facilities of the classes they Shadow have almost always been removed and their data members are difficult to access. The methods on a Shadow class usually either Shadow the methods on the original class or facilitate testing by setting up return values or providing access to internal state or logged method calls.</p>
+
+<p>Shadow classes should mimic the production classes&#39; inheritance hierarchy. For example, if you are implementing a Shadow for <code>ViewGroup</code>, <code>ShadowViewGroup</code>, then your Shadow class should extend <code>ViewGroup</code>&#39;s superclass&#39;s Shadow, <code>ShadowView</code>.  </p>
+<pre class="highlight java">  <span class="o">...</span>
+  <span class="nd">@Implements</span><span class="o">(</span><span class="n">ViewGroup</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+  <span class="kd">public</span> <span class="kd">class</span> <span class="nc">ShadowViewGroup</span> <span class="kd">extends</span> <span class="n">ShadowView</span> <span class="o">{</span>
+  <span class="o">...</span>
+</pre>
+<h3>Methods</h3>
+
+<p>Shadow objects implement methods that have the same signature as the Android class. Robolectric will invoke the method on a Shadow object when a method with the same signature on the Android object is invoked.</p>
+
+<p>Suppose an application defined the following line of code:
+<code>java
+  ...
+  this.imageView.setImageResource(R.drawable.pivotallabs_logo);
+  ...
+</code></p>
+
+<p>Under test the <code>ShadowImageView#setImageResource(int resId)</code> method on the Shadow instance would be invoked.</p>
+
+<p>Shadow methods must be marked with the <code>@Implementation</code> annotation. Robolectric includes a lint test to help ensure this is done correctly.</p>
+<pre class="highlight java"><span class="nd">@Implements</span><span class="o">(</span><span class="n">ImageView</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ShadowImageView</span> <span class="kd">extends</span> <span class="n">ShadowView</span> <span class="o">{</span>
+  <span class="o">...</span>   
+  <span class="nd">@Implementation</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="n">setImageResource</span><span class="o">(</span><span class="kt">int</span> <span class="n">resId</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// implementation here.</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre>
+<p>It is important Shadow methods are implemented on the corresponding Shadow of the class in which they were originally defined. Otherwise Robolectric&#39;s lookup mechanism will not find them (even if they have been declared on a Shadow subclass.) For example, the method <code>setEnabled()</code> is defined on View. If a <code>setEnabled()</code> method is defined on <code>ShadowViewGroup</code> instead of <code>ShadowView</code> then it will not be found at run time even when <code>setEnabled()</code> is called on an instance of <code>ViewGroup</code>. </p>
+
+<h3>Shadowing Constructors</h3>
+
+<p>Once a Shadow object is instantiated, Robolectric will look for a method named  <code>__constructor__</code> which has the same arguments as the constructor that was invoked on the real object.</p>
+
+<p>For instance, if the application code were to invoke the TextView constructor which receives a Context:</p>
+<pre class="highlight java"><span class="k">new</span> <span class="nf">TextView</span><span class="p">(</span><span class="n">context</span><span class="o">);</span>
+</pre>
+<p>Robolectric would invoke the following  <code>__constructor__</code> method that receives a Context:</p>
+<pre class="highlight java"><span class="nd">@Implements</span><span class="o">(</span><span class="n">TextView</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ShadowTextView</span> <span class="o">{</span>
+  <span class="o">...</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="n">__constructor__</span><span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">context</span> <span class="o">=</span> <span class="n">context</span><span class="o">;</span>
+  <span class="o">}</span>
+  <span class="o">...</span>
+</pre>
+<h3>Getting access to the real instance</h3>
+
+<p>Sometimes Shadow classes may want to refer to the object they are shadowing, e.g. to manipulate fields. A Shadow class can accomplish this by declaring a field annotated <code>@RealObject</code>:</p>
+<pre class="highlight java"><span class="nd">@Implements</span><span class="o">(</span><span class="n">Point</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ShadowPoint</span> <span class="o">{</span>
+  <span class="nd">@RealObject</span> <span class="kd">private</span> <span class="n">Point</span> <span class="n">realPoint</span><span class="o">;</span>
+  <span class="o">...</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="n">__constructor__</span><span class="o">(</span><span class="kt">int</span> <span class="n">x</span><span class="o">,</span> <span class="kt">int</span> <span class="n">y</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">realPoint</span><span class="o">.</span><span class="na">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">;</span>
+    <span class="n">realPoint</span><span class="o">.</span><span class="na">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">;</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre>
+<p>Robolectric will set realPoint to the actual instance of <code>Point</code> before invoking any other methods.</p>
+
+<p>It is important to note that methods called on the real object will still be intercepted and redirected by Robolectric. This does not often matter in test code, but it has important implications for Shadow class implementors. Since the Shadow class inheritance hierarchy does not always mirror that of their associated Android classes, it is sometimes necessary to make calls through these real objects so that the Robolectric runtime will have the opportunity to route them to the correct Shadow class based on the actual class of the object. Otherwise methods on Shadows of base classes would be unable to access methods on the Shadows of their subclasses.</p>
+
+        </div>
+    </div>
+</body>
+</html>

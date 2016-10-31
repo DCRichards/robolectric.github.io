@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Robolectric</title>
+    <script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(["_setAccount", "UA-58882116-1"]);
+  _gaq.push(["_trackPageview"]);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+    <link href="../images/favicon.ico" rel="icon" type="image/ico" />
+    <link href="../stylesheets/application-4badc936.css" rel="stylesheet" type="text/css" />
+    <script src="../javascripts/application-da39a3ee.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="sidebar">
+            <a href="/"><img class="logo" src="../images/robolectric-stacked-3f7ad42c.png" /></a>
+<ul class='nav nav-stacked'><li class='nav-header'>Setup</li><li class='nav-item'><a href='/getting-started/'>Getting Started</a></li><li class='nav-item'><a href='/writing-a-test/'>Writing Your First Test</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>User Guide</li><li class='nav-item'><a href='/configuring/'>Configuring Robolectric</a></li><li class='nav-item'><a href='/activity-lifecycle/'>Driving the Activity Lifecycle</a></li><li class='nav-item'><a href='/using-add-on-modules/'>Using Add-On Modules</a></li><li class='nav-item'><a href='/using-libraries/'>Using Library Resources</a></li><li class='nav-item'><a href='/using-qualifiers/'>Using Qualified Resources</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>Customizing</li><li class='nav-item'><a href='/extending/'>Extending Robolectric</a></li><li class='nav-item'><a href='/custom-shadows/'>Creating Custom Shadows</a></li><li class='nav-item'><a href='/custom-test-runner/'>Customizing the Test Runner</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>Contributing</li><li class='nav-item'><a href='/contributing/'>Contributor Guidelines</a></li></ul>
+
+            <ul class="nav nav-stacked">
+    <li class="nav-header">Resources</li>
+    <li class="nav-item">
+        <a href='http://groups.google.com/group/robolectric'>Mailing List</a>
+    </li>
+    <li class="nav-item">
+        <a href='http://robolectric.blogspot.com/'>Blog</a>
+    </li>
+    <li class="nav-item">
+        <a href='https://twitter.com/robolectric'>Twitter</a>
+    </li>
+    <li class="nav-item">
+        <a href='/javadoc/3.1/index.html'>Robolectric 3.1 Javadocs</a>
+    </li>
+    <li class="nav-item">
+        <a href='/javadoc/3.0/index.html'>Robolectric 3.0 Javadocs</a>
+    </li>
+    <li class="nav-item">
+        <a href='/javadoc/2.4/index.html'>Robolectric 2.4 Javadocs</a>
+    </li>
+</ul>
+
+        </div>
+
+        <div id="content">
+            <h1>Using Qualified Resources</h1>
+
+<p>As described <a href="http://developer.android.com/guide/topics/resources/providing-resources.html#AlternativeResources">in the android developer docs</a>, resource qualifiers allow you to change how your resources are loaded based on such factors as the language on the device, to the screen size, to whether it is day or night.  While these changes are often tedious to test rigorously (every string has a translation for all supported languages), you may find yourself wishing to run tests in different resource qualified contexts.</p>
+
+<h2>Specifying Resources in Test</h2>
+
+<p>Specifying a resource qualifier is quite simple: simply add the desired qualifiers to the @Config annotation on your test case or test class, depending on whether you would like to change the resource qualifiers for the whole file, or simply one test.</p>
+
+<p>Given the following resources,</p>
+
+<p><em>values/strings.xml</em></p>
+<pre class="highlight plaintext">&lt;string name="not_overridden"&gt;Not Overridden&lt;/string&gt;
+&lt;string name="overridden"&gt;Unqualified value&lt;/string&gt;
+&lt;string name="overridden_twice"&gt;Unqualified value&lt;/string&gt;
+</pre>
+<p><em>values-en/strings.xml</em></p>
+<pre class="highlight plaintext">&lt;string name="overridden"&gt;English qualified value&lt;/string&gt;
+&lt;string name="overridden_twice"&gt;English qualified value&lt;/string&gt;
+</pre>
+<p><em>values-en-port/strings.xml</em></p>
+<pre class="highlight plaintext">&lt;string name="overridden_twice"&gt;English portrait qualified value&lt;/string&gt;
+</pre>
+<p>this Robolectric test would pass, using the Android resource qualifier resolution rules.</p>
+<pre class="highlight plaintext">@Test
+@Config(qualifiers="en-port")
+public void shouldUseEnglishAndPortraitResources() {
+  final Context context = RuntimeEnvironment.application;
+  assertThat(context.getString(R.id.not_overridden)).isEqualTo("Not Overridden");
+  assertThat(context.getString(R.id.overridden)).isEqualTo("English qualified value");
+  assertThat(context.getString(R.id.overridden_twice)).isEqualTo("English portrait qualified value");
+}
+</pre>
+<p>Multiple qualifiers should be separated by dashes and provided in the order put forth in <a href="http://developer.android.com/guide/topics/resources/providing-resources.html#table2">this list</a>.</p>
+
+        </div>
+    </div>
+</body>
+</html>

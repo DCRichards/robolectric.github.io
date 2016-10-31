@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Robolectric</title>
+    <script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(["_setAccount", "UA-58882116-1"]);
+  _gaq.push(["_trackPageview"]);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+    <link href="../images/favicon.ico" rel="icon" type="image/ico" />
+    <link href="../stylesheets/application-4badc936.css" rel="stylesheet" type="text/css" />
+    <script src="../javascripts/application-da39a3ee.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="sidebar">
+            <a href="/"><img class="logo" src="../images/robolectric-stacked-3f7ad42c.png" /></a>
+<ul class='nav nav-stacked'><li class='nav-header'>Setup</li><li class='nav-item'><a href='/getting-started/'>Getting Started</a></li><li class='nav-item'><a href='/writing-a-test/'>Writing Your First Test</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>User Guide</li><li class='nav-item'><a href='/configuring/'>Configuring Robolectric</a></li><li class='nav-item'><a href='/activity-lifecycle/'>Driving the Activity Lifecycle</a></li><li class='nav-item'><a href='/using-add-on-modules/'>Using Add-On Modules</a></li><li class='nav-item'><a href='/using-libraries/'>Using Library Resources</a></li><li class='nav-item'><a href='/using-qualifiers/'>Using Qualified Resources</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>Customizing</li><li class='nav-item'><a href='/extending/'>Extending Robolectric</a></li><li class='nav-item'><a href='/custom-shadows/'>Creating Custom Shadows</a></li><li class='nav-item'><a href='/custom-test-runner/'>Customizing the Test Runner</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>Contributing</li><li class='nav-item'><a href='/contributing/'>Contributor Guidelines</a></li></ul>
+
+            <ul class="nav nav-stacked">
+    <li class="nav-header">Resources</li>
+    <li class="nav-item">
+        <a href='http://groups.google.com/group/robolectric'>Mailing List</a>
+    </li>
+    <li class="nav-item">
+        <a href='http://robolectric.blogspot.com/'>Blog</a>
+    </li>
+    <li class="nav-item">
+        <a href='https://twitter.com/robolectric'>Twitter</a>
+    </li>
+    <li class="nav-item">
+        <a href='/javadoc/3.1/index.html'>Robolectric 3.1 Javadocs</a>
+    </li>
+    <li class="nav-item">
+        <a href='/javadoc/3.0/index.html'>Robolectric 3.0 Javadocs</a>
+    </li>
+    <li class="nav-item">
+        <a href='/javadoc/2.4/index.html'>Robolectric 2.4 Javadocs</a>
+    </li>
+</ul>
+
+        </div>
+
+        <div id="content">
+            <h1>Writing Your First Test</h1>
+
+<p>Let&#39;s say you have an activity layout that represents a welcome screen:</p>
+<pre class="highlight xml"><span class="cp">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="nt">&lt;LinearLayout</span>
+    <span class="na">xmlns:android=</span><span class="s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="na">android:layout_width=</span><span class="s">"match_parent"</span>
+    <span class="na">android:layout_height=</span><span class="s">"match_parent"</span><span class="nt">&gt;</span>
+
+    <span class="nt">&lt;Button</span>
+        <span class="na">android:id=</span><span class="s">"@+id/login"</span>
+        <span class="na">android:text=</span><span class="s">"Login"</span>
+        <span class="na">android:layout_width=</span><span class="s">"wrap_content"</span>
+        <span class="na">android:layout_height=</span><span class="s">"wrap_content"</span><span class="nt">/&gt;</span>
+
+<span class="nt">&lt;/LinearLayout&gt;</span>
+</pre>
+<p>We want to write a test that asserts that when a user clicks on a button, the app launches the LoginActivity.</p>
+<pre class="highlight plaintext">public class WelcomeActivity extends Activity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.welcome_activity);
+
+        final View button = findViewById(R.id.login);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(WelcomeActivity.this, LoginActivity.class));
+            }
+        });
+    }
+}
+</pre>
+<p>In order to test this, we can check that when a user clicks on the &quot;Login&quot; button, we start the correct intent. Because Robolectric is a unit testing framework, the LoginActivity will not actually be started, but we can check that the WelcomeActivity fired the correct intent:</p>
+<pre class="highlight plaintext">@RunWith(RobolectricTestRunner.class)
+public class WelcomeActivityTest {
+
+    @Test
+    public void clickingLogin_shouldStartLoginActivity() {
+        WelcomeActivity activity = Robolectric.setupActivity(WelcomeActivity.class);
+        activity.findViewById(R.id.login).performClick();
+
+        Intent expectedIntent = new Intent(activity, LoginActivity.class);
+        assertThat(shadowOf(activity).getNextStartedActivity()).isEqualTo(expectedIntent);
+    }
+}
+</pre>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Robolectric</title>
+    <script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(["_setAccount", "UA-58882116-1"]);
+  _gaq.push(["_trackPageview"]);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+    <link href="../images/favicon.ico" rel="icon" type="image/ico" />
+    <link href="../stylesheets/application-4badc936.css" rel="stylesheet" type="text/css" />
+    <script src="../javascripts/application-da39a3ee.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="sidebar">
+            <a href="/"><img class="logo" src="../images/robolectric-stacked-3f7ad42c.png" /></a>
+<ul class='nav nav-stacked'><li class='nav-header'>Setup</li><li class='nav-item'><a href='/getting-started/'>Getting Started</a></li><li class='nav-item'><a href='/writing-a-test/'>Writing Your First Test</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>User Guide</li><li class='nav-item'><a href='/configuring/'>Configuring Robolectric</a></li><li class='nav-item'><a href='/activity-lifecycle/'>Driving the Activity Lifecycle</a></li><li class='nav-item'><a href='/using-add-on-modules/'>Using Add-On Modules</a></li><li class='nav-item'><a href='/using-libraries/'>Using Library Resources</a></li><li class='nav-item'><a href='/using-qualifiers/'>Using Qualified Resources</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>Customizing</li><li class='nav-item'><a href='/extending/'>Extending Robolectric</a></li><li class='nav-item'><a href='/custom-shadows/'>Creating Custom Shadows</a></li><li class='nav-item'><a href='/custom-test-runner/'>Customizing the Test Runner</a></li></ul><ul class='nav nav-stacked'><li class='nav-header'>Contributing</li><li class='nav-item'><a href='/contributing/'>Contributor Guidelines</a></li></ul>
+
+            <ul class="nav nav-stacked">
+    <li class="nav-header">Resources</li>
+    <li class="nav-item">
+        <a href='http://groups.google.com/group/robolectric'>Mailing List</a>
+    </li>
+    <li class="nav-item">
+        <a href='http://robolectric.blogspot.com/'>Blog</a>
+    </li>
+    <li class="nav-item">
+        <a href='https://twitter.com/robolectric'>Twitter</a>
+    </li>
+    <li class="nav-item">
+        <a href='/javadoc/3.1/index.html'>Robolectric 3.1 Javadocs</a>
+    </li>
+    <li class="nav-item">
+        <a href='/javadoc/3.0/index.html'>Robolectric 3.0 Javadocs</a>
+    </li>
+    <li class="nav-item">
+        <a href='/javadoc/2.4/index.html'>Robolectric 2.4 Javadocs</a>
+    </li>
+</ul>
+
+        </div>
+
+        <div id="content">
+            <h1>Customizing the Test Runner</h1>
+
+<p>There are several situations where you want to customize Robolectric&#39;s test runner to perform some operation
+before all tests are run, or even before each test method is run. One good example is initializing a dependency
+injection framework with a different set of dependencies for your test. Fortunately, Robolectric has a way to
+hook into the test lifecycle. If you define an Application class in your AndroidManifest.xml, Robolectric will
+automatically try and load a test version of your application class first. For example:</p>
+
+<p>Let&#39;s say you&#39;ve defined a FooApplication in your manifest:</p>
+<pre class="highlight xml"><span class="nt">&lt;application</span> <span class="na">android:name=</span><span class="s">".FooApplication"</span><span class="nt">&gt;</span>
+</pre>
+<p>If you&#39;re using RoboGuice, you would initialize the injector in your Application class:</p>
+<pre class="highlight java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">FooApplication</span> <span class="kd">extends</span> <span class="n">Application</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onCreate</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">();</span>
+
+        <span class="n">ApplicationModule</span> <span class="n">module</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ApplicationModule</span><span class="o">();</span>
+        <span class="n">setBaseApplicationInjector</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">DEFAULT_STAGE</span><span class="o">,</span> <span class="n">newDefaultRoboModule</span><span class="o">(</span><span class="k">this</span><span class="o">),</span> <span class="n">module</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre>
+<p>You can define a test version of the application named TestFooApplication:</p>
+<pre class="highlight java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">TestFooApplication</span> <span class="kd">extends</span> <span class="n">FooApplication</span> <span class="kd">implements</span> <span class="n">TestLifecycleApplication</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">onCreate</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">();</span>
+
+        <span class="n">TestApplicationModule</span> <span class="n">module</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TestApplicationModule</span><span class="o">();</span>
+        <span class="n">setBaseApplicationInjector</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="n">DEFAULT_STAGE</span><span class="o">,</span> <span class="n">newDefaultRoboModule</span><span class="o">(</span><span class="k">this</span><span class="o">),</span> <span class="n">module</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">beforeTest</span><span class="o">(</span><span class="n">Method</span> <span class="n">method</span><span class="o">)</span> <span class="o">{</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">prepareTest</span><span class="o">(</span><span class="n">Object</span> <span class="n">test</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">getInjector</span><span class="o">(</span><span class="k">this</span><span class="o">).</span><span class="na">injectMembers</span><span class="o">(</span><span class="n">test</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="n">afterTest</span><span class="o">(</span><span class="n">Method</span> <span class="n">method</span><span class="o">)</span> <span class="o">{</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre>
+<p>Robolectric will load the test version of the application which you can use to load a different set of bindings
+during tests.</p>
+
+        </div>
+    </div>
+</body>
+</html>
